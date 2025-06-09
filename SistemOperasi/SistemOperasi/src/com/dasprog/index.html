@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Round Robin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f2f2f2;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #999;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simulasi Penjadwalan Round Robin</h1>
+
+  <label>Quantum Time:</label>
+  <input type="number" id="quantum" value="2">
+  <br><br>
+
+  <label>Masukkan Proses (Format: P1,5 | P2,3):</label><br>
+  <textarea id="inputProses" rows="4" cols="50">P1,5
+P2,3
+P3,1
+P4,2</textarea><br><br>
+
+  <button onclick="jalankanRoundRobin()">Jalankan Simulasi</button>
+
+  <h2>Hasil Eksekusi:</h2>
+  <div id="output"></div>
+
+  <script>
+    function jalankanRoundRobin() {
+      const quantum = parseInt(document.getElementById("quantum").value);
+      const input = document.getElementById("inputProses").value.trim().split('\n');
+      const proses = input.map(baris => {
+        const [nama, waktu] = baris.split(',');
+        return { nama: nama.trim(), waktu: parseInt(waktu), sisa: parseInt(waktu) };
+      });
+
+      const hasil = [];
+      let waktu = 0;
+
+      while (proses.some(p => p.sisa > 0)) {
+        for (let p of proses) {
+          if (p.sisa > 0) {
+            const waktuEksekusi = Math.min(quantum, p.sisa);
+            hasil.push({
+              proses: p.nama,
+              mulai: waktu,
+              selesai: waktu + waktuEksekusi
+            });
+            waktu += waktuEksekusi;
+            p.sisa -= waktuEksekusi;
+          }
+        }
+      }
+
+      tampilkanHasil(hasil);
+    }
+
+    function tampilkanHasil(hasil) {
+      let output = "<table><tr><th>Proses</th><th>Mulai</th><th>Selesai</th></tr>";
+      for (let item of hasil) {
+        output += `<tr><td>${item.proses}</td><td>${item.mulai}</td><td>${item.selesai}</td></tr>`;
+      }
+      output += "</table>";
+      document.getElementById("output").innerHTML = output;
+    }
+  </script>
+
+</body>
+</html>
